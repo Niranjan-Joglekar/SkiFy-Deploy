@@ -1,15 +1,13 @@
 import { Navbar } from "@/components/Navbar";
-import { Be_Vietnam_Pro } from "next/font/google";
-
-const beVietnamProFont = Be_Vietnam_Pro({
-  weight: "300",
-  subsets: ["latin"]
-})
+import Head from "next/head";
 
 export default function Home() {
-  return (
-    <div className={`${beVietnamProFont.className}`}>
-      <Navbar />
-    </div>
-  );
+    return (
+        <div>
+            <Head>
+                <link rel="icon" type="image/png" href="/logo.png" />
+            </Head>
+            <Navbar />
+        </div>
+    );
 }

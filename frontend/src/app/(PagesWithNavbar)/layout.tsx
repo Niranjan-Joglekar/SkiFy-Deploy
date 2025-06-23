@@ -11,7 +11,6 @@ const beVietnamProFont = Be_Vietnam_Pro({
 
 const codeFont = Cutive_Mono({
   weight: "400",
-  subsets: ["latin"],
   variable: "--font-cutive-mono"
 })
 
@@ -31,6 +30,7 @@ export default function RootLayout({
       <body
         className={`${beVietnamProFont.variable} ${codeFont.variable} antialiased`}
       >
+        <Navbar />
         {children}
       </body>
     </html>
