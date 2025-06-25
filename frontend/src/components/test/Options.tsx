@@ -1,3 +1,4 @@
+"use client"
 import { Label } from "@/components/ui/label"
 import {
   RadioGroup,
@@ -5,6 +6,7 @@ import {
 } from "@/components/ui/radio-group"
 
 export default function Options({ options }: { options: string[] }) {
+  console.log(options);
   return (
     <RadioGroup>
           {options.map((option, index) => (

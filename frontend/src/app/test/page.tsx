@@ -53,10 +53,11 @@ export default function Home() {
                     </div>
                     <div id="options" className="mt-5">
                         <Options options={[
-                            data?.options[1] || 'Loading Option 1...',
-                            data?.options[2] || 'Loading Option 2...',
-                            data?.options[3] || 'Loading Option 3...',
-                            data?.options[4] || 'Loading Option 4...'
+                            'Loading Option 1...',
+                            'Loading Option 2...',
+                            'Loading Option 3...',
+                            'Loading Option 4...',
+                            // data?.options[1] || 
                         ]} />
                     </div>
                 </div>

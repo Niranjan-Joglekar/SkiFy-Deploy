@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Be_Vietnam_Pro, Cutive_Mono } from "next/font/google";
 import "@/app/globals.css";
-import { Navbar } from "@/components/Navbar";
 
 const beVietnamProFont = Be_Vietnam_Pro({
   weight: "400",
