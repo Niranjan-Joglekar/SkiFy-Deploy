@@ -86,7 +86,7 @@ export default function Home() {
                             data?.option_4 || "Loading Option 4...",
                         ]} />
                     </div>
-                    <Button onClick={()=> fetchNextQuestion("1", 15, data.expected_time_sec || 30)} className="bg-green-500 hover:bg-green-600 cursor-pointer my-5">Submit & Next</Button>
+                    <Button onClick={()=> fetchNextQuestion("1", 15, data?.expected_time_sec || 30)} className="bg-green-500 hover:bg-green-600 cursor-pointer my-5">Submit & Next</Button>
                 </div>
                 <div id="Navigation Pane" className="w-[30vw] text-center">
                     <div id="Remaining Time">
