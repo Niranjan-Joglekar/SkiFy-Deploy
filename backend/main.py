@@ -13,3 +13,5 @@ app.add_middleware(
 )
 
 app.include_router(test_eg.router, prefix="/test_eg")
+
+handler = app
