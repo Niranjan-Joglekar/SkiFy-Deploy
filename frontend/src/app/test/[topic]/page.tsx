@@ -8,20 +8,20 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 // API
-interface FirstQuestion {
+interface Question {
     question: string,
-    // questionNumber: number,
     // codeForQuestion: string,
     option_1: string,
     option_2: string,
     option_3: string,
     option_4: string,
+    question_number: number,
     correct_option: string,
     expected_time_sec: number,
 }
 
 export default function Home() {
-    const [data, setData] = useState<FirstQuestion | null>(null);
+    const [data, setData] = useState<Question | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
     const { topic } = useParams()
@@ -66,6 +66,7 @@ export default function Home() {
         <div className="">
             <div className="flex justify-between">
                 <div className="ml-10 mt-10">
+                    {data?.question_number}/20
                     <div id="questionData">
                         <div id="question" className="font-sans">
                             {
@@ -99,7 +100,7 @@ export default function Home() {
                     className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
                     style={{
                         width: `${(
-                            // data?.questionNumber ??
+                            data?.question_number ??
                             5 / 20) * 100}%`
                     }}
                 ></div>
