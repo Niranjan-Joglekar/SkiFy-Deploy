@@ -33,6 +33,7 @@ def get_next_question():
 
     # Return only safe data to frontend
     return {
+        "question_number": test_state["question_number"],
         "question": full_question["question"],
         "option_1": full_question["option_1"],
         "option_2": full_question["option_2"],
@@ -87,6 +88,7 @@ def submit_answer(answer: AnswerInput):
             "message": "Test completed",
             "results": test_state["all_questions"]
         }
+        
 
     return {
         "correct": correct,
