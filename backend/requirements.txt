@@ -1,4 +1,7 @@
 fastapi
 google.generativeai
 dotenv
+python-multipart
+pillow
+PyMuPDF
 fastapi[standard]

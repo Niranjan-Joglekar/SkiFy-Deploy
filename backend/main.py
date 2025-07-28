@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import test_eg
+from routers import test, resume_analysis
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -12,6 +12,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(test_eg.router, prefix="/test_eg")
+app.include_router(test.router, prefix="/test")
+app.include_router(resume_analysis.router, prefix="/resume")
 
 handler = app

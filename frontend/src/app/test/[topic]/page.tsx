@@ -29,7 +29,7 @@ export default function Home() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/test_eg/start/${topic}` || '');
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/test/start/${topic}` || '');
                 setData(response.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -44,7 +44,7 @@ export default function Home() {
 
     const fetchNextQuestion = async (chosen_option: string, time_taken: number, expected_time: number) => {
         try {
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/test_eg/answer`, {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/test/answer`, {
                 question: data?.question,
                 correct_option: 3,
                 user_answer: chosen_option,
