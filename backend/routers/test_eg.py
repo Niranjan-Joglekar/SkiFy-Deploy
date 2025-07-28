@@ -1,185 +1,137 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
+from typing import List
 from services.gemini import generate_question, adjust_difficulty
 
 router = APIRouter()
 
+# Store state in memory (simulate session)
 test_state = {
     "topic": "",
     "current_level": 3,
     "window": [],
     "question_number": 1,
-    "total_questions": 10,
-    "all_questions": [],
-    "current_question_data": {}
+    "total_questions": 10
 }
 
 class AnswerInput(BaseModel):
     user_answer: int
+    correct_option: int
     time_taken: float
-
-def get_next_question():
-    level = 3 if test_state["question_number"] <= 3 else test_state["current_level"]
-    
-    full_question = generate_question(test_state["topic"], level)
-
-    # Store correct answer internally
-    test_state["current_question_data"] = {
-        "question": full_question["question"],
-        "correct_option": int(full_question["correct_option"]),
-        "expected_time": full_question.get("expected_time_sec", 30),
-        "difficulty": level
-    }
-
-    # Return only safe data to frontend
-    return {
-        "question_number": test_state["question_number"],
-        "question": full_question["question"],
-        "option_1": full_question["option_1"],
-        "option_2": full_question["option_2"],
-        "option_3": full_question["option_3"],
-        "option_4": full_question["option_4"],
-        "expected_time_sec": full_question.get("expected_time_sec", 30),
-    }
+    expected_time: float
 
 @router.get("/start/{topic}")
 def start_test(topic: str):
-    test_state.update({
-        "topic": topic,
-        "current_level": 3,
-        "window": [],
-        "question_number": 1,
-        "all_questions": [],
-        "current_question_data": {}
-    })
+    test_state["topic"] = topic
+    test_state["current_level"] = 3
+    test_state["window"] = []
+    test_state["question_number"] = 1
 
-    return get_next_question()
+    question = generate_question(topic, test_state["current_level"])
+    return question
 
 @router.post("/answer")
 def submit_answer(answer: AnswerInput):
-    current_q = test_state["current_question_data"]
-
-    correct = answer.user_answer == current_q["correct_option"]
-
-    question_data = {
-        "question": current_q["question"],
-        "correct": correct,
+    response = {
+        "correct": answer.user_answer == answer.correct_option,
         "time_taken": answer.time_taken,
-        "expected_time": current_q["expected_time"],
-        "difficulty": current_q["difficulty"]
+        "expected_time": answer.expected_time,
+        "difficulty": test_state["current_level"]
     }
 
-    # Update history and window
-    test_state["all_questions"].append(question_data)
-    test_state["window"].append(question_data)
-
+    test_state["window"].append(response)
     if len(test_state["window"]) > 3:
         test_state["window"].pop(0)
 
     if len(test_state["window"]) == 3:
         test_state["current_level"] = adjust_difficulty(
-            test_state["current_level"], test_state["window"]
-        )
+            test_state["current_level"], test_state["window"])
 
     test_state["question_number"] += 1
 
     if test_state["question_number"] > test_state["total_questions"]:
-        return {
-            "message": "Test completed",
-            "results": test_state["all_questions"]
-        }
-        
+        return {"message": "Test completed"}
 
+    question = generate_question(test_state["topic"], test_state["current_level"])
     return {
-        "correct": correct,
-        "next_question_number": test_state["question_number"],
-        "next_question": get_next_question(),
+        "next_question": question,
         "current_level": test_state["current_level"]
     }
-    
-@router.get("/score")
-def get_score():
-    return {
-        "total_answered": len(test_state["all_questions"]),
-        "questions": test_state["all_questions"]
-    }
-
 
 
 # from fastapi import APIRouter
 # from pydantic import BaseModel
-# from services.gemini import generate_question, adjust_difficulty
+# from typing import List
+# from services.gemini import generate_question
 
 # router = APIRouter()
 
+# # In-memory test state (use database for real app)
 # test_state = {
-#     "topic": "",
 #     "current_level": 3,
-#     "window": [],
-#     "question_number": 1,
-#     "total_questions": 10,
-#     "all_questions": []
+#     "questions_answered": [],
+#     "score": 0
 # }
 
 # class AnswerInput(BaseModel):
 #     question: str
-#     correct_option: int
-#     user_answer: int
+#     user_answer: str  # "1", "2", "3", or "4"
+#     correct_option: str
 #     time_taken: float
-#     expected_time: float
-#     level: int
 
-# def get_next_question():
-#     if test_state["question_number"] <= 3:
-#         level = 3
-#     else:
-#         level = test_state["current_level"]
-    
-#     return generate_question(test_state["topic"], level)
-
-# @router.get("/start/{topic}")
+# @router.get("/start")
 # def start_test(topic: str):
-#     test_state["topic"] = topic
 #     test_state["current_level"] = 3
-#     test_state["window"] = []
-#     test_state["question_number"] = 1
-#     test_state["all_questions"] = []
+#     test_state["questions_answered"] = []
+#     test_state["score"] = 0
 
-#     question = get_next_question()
+#     question = generate_question({topic}, test_state["current_level"])
 #     return question
 
 # @router.post("/answer")
-# def submit_answer(answer: AnswerInput):
-#     correct = answer.user_answer == answer.correct_option
+# def submit_answer(answer: AnswerInput, topic: str):
+#     is_correct = answer.user_answer.lower() == answer.correct_option.lower()
 
-#     question_data = {
-#         "question": answer.question,
-#         "correct": correct,
-#         "time_taken": answer.time_taken,
-#         "expected_time": answer.expected_time,
-#         "difficulty": test_state["current_level"]
-#     }
+#     # Update score
+#     time_bonus = get_time_bonus(answer.time_taken)
+#     if is_correct:
+#         test_state["score"] += test_state["current_level"] * time_bonus
 
-#     test_state["all_questions"].append(question_data)
-#     test_state["window"].append(question_data)
+#     # Save history
+#     test_state["questions_answered"].append({
+#         "correct": is_correct,
+#         "level": test_state["current_level"],
+#         "time": answer.time_taken
+#     })
 
-#     if len(test_state["window"]) > 3:
-#         test_state["window"].pop(0)
+#     # Update level based on last 3 responses
+#     if len(test_state["questions_answered"]) >= 3:
+#         last_three = test_state["questions_answered"][-3:]
+#         correct_count = sum(1 for q in last_three if q["correct"])
+#         if correct_count >= 2:
+#             test_state["current_level"] = min(5, test_state["current_level"] + 1)
+#         elif correct_count == 0:
+#             test_state["current_level"] = max(1, test_state["current_level"] - 1)
 
-#     if len(test_state["window"]) == 3:
-#         test_state["current_level"] = adjust_difficulty(
-#             test_state["current_level"], test_state["window"]
-#         )
+#     # Generate next question
+#     next_question = generate_question({topic}, test_state["current_level"])
 
-#     test_state["question_number"] += 1
-
-#     if test_state["question_number"] > test_state["total_questions"]:
-#         return {"message": "Test completed"}
-
-#     question = get_next_question()
 #     return {
-#         "correct": correct,
-#         "next_question_number": test_state["question_number"],
-#         "next_question": question,
-#         "current_level": test_state["current_level"]
+#         "correct": is_correct,
+#         "score": round(test_state["score"], 2),
+#         "next_level": test_state["current_level"],
+#         "next_question": next_question
 #     }
+
+# def get_time_bonus(time_taken: float):
+#     if time_taken < 30:
+#         return 1.2
+#     elif time_taken < 60:
+#         return 1.0
+#     elif time_taken < 120:
+#         return 0.8
+#     else:
+#         return 0.6
+
+
+
