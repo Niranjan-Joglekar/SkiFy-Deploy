@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { Menu, X } from "lucide-react"
 import logo from "../../public/logo.png"
+import { usePathname } from "next/navigation"
 
 import {
   NavigationMenu,
@@ -78,6 +79,7 @@ const authNavbarItems: { title: string; href: string; description: string, class
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const pathname = usePathname()
 
   return (
     <div className="relative flex justify-between items-center w-full my-3">
@@ -94,7 +96,12 @@ export function Navbar() {
           {navbarItems.map((listItem, index) => (
             <NavigationMenuItem key={index}>
               <NavigationMenuLink asChild>
-                <Link href={listItem.href}>{listItem.title}</Link>
+                <Link
+                  href={listItem.href}
+                  className={pathname.includes(listItem.href) && listItem.href !== "/" ? "text-blue-500" : ""}
+                >
+                  {listItem.title}
+                </Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
           ))}
@@ -137,7 +144,7 @@ export function Navbar() {
                 <Link
                   key={index}
                   href={listItem.href}
-                  className="py-2 px-4 hover:bg-gray-100 rounded transform transition-all duration-300 ease-out"
+                  className={`py-2 px-4 hover:bg-gray-100 rounded transform transition-all duration-300 ease-out ${pathname.includes(listItem.href) && listItem.href !== "/" ? "text-blue-500" : ""}`}
                   style={{
                     animation: `slideInRight 0.3s ease-out ${index * 0.1}s both`
                   }}

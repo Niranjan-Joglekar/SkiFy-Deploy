@@ -196,7 +196,7 @@ export const TestInterface: React.FC = () => {
                                 <Timer
                                     key={timerKey}
                                     duration={currentQuestion?.expected_time_sec || 90}
-                                    isActive={true}
+                                    isActive={!loading && currentQuestion !== null}
                                     onTimeUp={handleTimeUp}
                                 />
                             </div>
@@ -205,13 +205,22 @@ export const TestInterface: React.FC = () => {
 
                     {/* Main Question Area */}
                     <div className="lg:col-span-3">
-                        <QuestionCard
-                            question={currentQuestion}
-                            selectedAnswer={testState.answers[testState.currentQuestion] ?? null}
-                            onAnswerSelect={handleAnswerSelect}
-                            questionNumber={currentQuestion?.question_number || 1}
-                            totalQuestions={totalQuestions}
-                        />
+                        {loading ? (
+                            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+                                <div className="flex flex-col items-center justify-center space-y-4">
+                                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                                    <p className="text-gray-600">Loading question...</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <QuestionCard
+                                question={currentQuestion}
+                                selectedAnswer={testState.answers[testState.currentQuestion] ?? null}
+                                onAnswerSelect={handleAnswerSelect}
+                                questionNumber={currentQuestion?.question_number || 1}
+                                totalQuestions={totalQuestions}
+                            />
+                        )}
 
                         {/* Navigation Controls */}
                         <div className="flex justify-between items-center mt-6">
@@ -220,6 +229,7 @@ export const TestInterface: React.FC = () => {
                                     <Button
                                         onClick={handleSubmitTest}
                                         className="bg-green-500 hover:bg-green-600"
+                                        disabled={loading}
                                     >
                                         <CircleCheckBig size={16} className="mr-2" />
                                         Submit Test
@@ -232,9 +242,9 @@ export const TestInterface: React.FC = () => {
                                             handleNextQuestion(chosen_option, timeSpent);
                                         }}
                                         className="bg-[#2563EB] hover:bg-blue-700 cursor-pointer"
-                                        disabled={testState.currentQuestion === totalQuestions || loading}
+                                        disabled={loading}
                                     >
-                                        Next
+                                        {loading ? 'Loading...' : 'Next'}
                                     </Button>
                                 )}
                             </div>

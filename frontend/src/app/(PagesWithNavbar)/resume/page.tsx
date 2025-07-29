@@ -18,7 +18,7 @@ export default function Resume() {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [isPercentageMatching, setIsPercentageMatching] = useState(false);
     const [isFindingTopSkills, setIsFindingTopSkills] = useState(false);
-    const [topSkillsResult, setTopSkillsResult] = useState<AnalysisResultProps>();
+    const [topSkillsResult, setTopSkillsResult] = useState<AnalysisResultProps | null>();
     const [analysisResult, setAnalysisResult] = useState<AnalysisResultProps | null>();
 
     const handleAnalyze = async () => {
@@ -28,7 +28,7 @@ export default function Resume() {
         }
 
         setIsAnalyzing(true);
-        setTopSkillsResult({ result: "" });
+        setTopSkillsResult(null);
         const formData = new FormData();
         formData.append('resume_file', uploadedFile);
         formData.append('job_description', jobDescription);
@@ -57,7 +57,7 @@ export default function Resume() {
         }
 
         setIsPercentageMatching(true);
-        setTopSkillsResult({ result: "" });
+        setTopSkillsResult(null);
         const formData = new FormData();
         formData.append('resume_file', uploadedFile);
         formData.append('job_description', jobDescription);
@@ -210,7 +210,16 @@ export default function Resume() {
                     </Button>
                 </div>
                 <div className="mt-6 border-2 rounded-lg m-6 p-4">
-                    {analysisResult ? (
+                    {(isAnalyzing || isPercentageMatching || isFindingTopSkills) ? (
+                        <div className="flex flex-col items-center justify-center py-8">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-4"></div>
+                            <p className="text-gray-600">
+                                {isAnalyzing && "Analyzing your resume..."}
+                                {isPercentageMatching && "Calculating match percentage..."}
+                                {isFindingTopSkills && "Finding top skills..."}
+                            </p>
+                        </div>
+                    ) : analysisResult ? (
                         <div>
                             <h3 className="text-lg font-semibold mb-2">Analysis Results:</h3>
                             <div className="prose max-w-none">
