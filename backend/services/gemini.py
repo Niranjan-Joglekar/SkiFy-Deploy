@@ -48,6 +48,7 @@ def generate_question(topic, difficulty):
     - The question should be conceptual or practical.
     - All 4 options must be plausible and equally likely.
     - Avoid giveaway clues by keyword, length, or formatting.
+    - Difficulty to time mapping - Very Easy (1): 10-15 sec, Easy (2): 15-30 sec, Medium (3): 30-50 sec, Hard (4): 50-80 sec, Very Hard (5): 80-120 sec
 
     Format strictly as:
     {{
