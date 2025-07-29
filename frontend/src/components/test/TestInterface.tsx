@@ -5,7 +5,7 @@ import { Button } from '../ui/button';
 import { QuestionCard } from './QuestionCard';
 import { Timer } from './Timer';
 import { ProgressIndicator } from './ProgressIndicator';
-import { useParams } from 'next/navigation';
+import { redirect, useParams } from 'next/navigation';
 import axios from 'axios';
 import { Question } from '@/lib/types';
 import Link from 'next/link';
@@ -103,9 +103,10 @@ export const TestInterface: React.FC = () => {
     }, [testState.currentQuestion, handleNextQuestion, currentQuestion]);
 
 
-    const handleSubmitTest = useCallback(() => {
+    const handleSubmitTest = useCallback(async () => {
         setTestState(prev => ({ ...prev, isCompleted: true }));
-    }, []);
+        redirect('/test/report')
+    }, [topic]);
 
     // const handleRestartTest = useCallback(() => {
     //     setTestState({
@@ -174,7 +175,7 @@ export const TestInterface: React.FC = () => {
                         </div>
                         <h1 className="text-xl text-gray-900">Ski-Fy</h1>
                     </div>
-                    <div className="text-xl text-center text-gray-900">Test on {topic}</div>
+                    <div className="text-xl text-center text-gray-900">Test on {decodeURIComponent(topic as string)}</div>
                 </div>
             </header>
             <div className='max-w-7xl mx-auto p-6'>
@@ -228,7 +229,7 @@ export const TestInterface: React.FC = () => {
                                 {testState.currentQuestion === totalQuestions ? (
                                     <Button
                                         onClick={handleSubmitTest}
-                                        className="bg-green-500 hover:bg-green-600"
+                                        className="bg-green-500 hover:bg-green-600 cursor-pointer"
                                         disabled={loading}
                                     >
                                         <CircleCheckBig size={16} className="mr-2" />

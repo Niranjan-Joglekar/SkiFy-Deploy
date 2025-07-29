@@ -9,12 +9,9 @@ import { usePathname } from "next/navigation"
 
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
 import Image from "next/image"
 
@@ -98,7 +95,7 @@ export function Navbar() {
               <NavigationMenuLink asChild>
                 <Link
                   href={listItem.href}
-                  className={pathname.includes(listItem.href) && listItem.href !== "/" ? "text-blue-500" : ""}
+                  className={pathname.includes(listItem.href) && listItem.href !== "/" ? "text-blue-500 hover:text-blue-600" : ""}
                 >
                   {listItem.title}
                 </Link>
@@ -144,7 +141,7 @@ export function Navbar() {
                 <Link
                   key={index}
                   href={listItem.href}
-                  className={`py-2 px-4 hover:bg-gray-100 rounded transform transition-all duration-300 ease-out ${pathname.includes(listItem.href) && listItem.href !== "/" ? "text-blue-500" : ""}`}
+                  className={`py-2 px-4 hover:bg-gray-100 rounded transform transition-all duration-300 ease-out ${pathname.includes(listItem.href) && listItem.href !== "/" ? "text-blue-500 hover:bg-blue-600" : ""}`}
                   style={{
                     animation: `slideInRight 0.3s ease-out ${index * 0.1}s both`
                   }}

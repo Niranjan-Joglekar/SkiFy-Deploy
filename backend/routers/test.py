@@ -10,7 +10,7 @@ test_state = {
     "current_level": 3,
     "window": [],
     "question_number": 1,
-    "total_questions": 5,
+    "total_questions": 11,
     "all_questions": [],
     "current_question_data": {}
 }

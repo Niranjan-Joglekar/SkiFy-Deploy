@@ -12,7 +12,7 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
   totalQuestions,
   answeredQuestions
 }) => {
-  const progressPercentage = ((currentQuestion - 1) / totalQuestions) * 100;
+  const progressPercentage = ((currentQuestion) / totalQuestions) * 100;
 
   return (
     <div className="space-y-4">
@@ -63,7 +63,7 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
       {/* Stats */}
       <div className="flex justify-between text-sm text-gray-600">
         <span>Answered: {answeredQuestions.size}</span>
-        <span>Remaining: {totalQuestions - answeredQuestions.size}</span>
+        <span>Unanswered: {totalQuestions - answeredQuestions.size}</span>
       </div>
     </div>
   );
