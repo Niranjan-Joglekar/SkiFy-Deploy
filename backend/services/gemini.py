@@ -129,36 +129,34 @@ def generate_holistic_report(all_test_results, job_description_text):
 
     results_str = "\n".join(results_summary)
 
-    prompt = f"""
-    As a professional technical recruiter and career coach, your task is to provide a holistic analysis of a candidate's performance in a series of technical skills tests and evaluate their fit for a specific job.
+    prompt = f"""As a professional technical recruiter and career coach, your task is to provide a holistic analysis of a candidate's performance in a series of technical skills tests and evaluate their fit for a specific job. Use professional language in your response.
 
-    *Job Description:*
-    ---
-    {job_description_text}
-    ---
+  Job Description:
+  ---
+  {job_description_text}
+  ---
 
-    *Candidate's Test Performance Summary:*
-    ---
-    {results_str}
-    ---
+  Candidate's Test Performance Summary:
+  ---
+  {results_str}
+  ---
 
-    Please generate a comprehensive report structured with the following sections. Use markdown for formatting (headings, bold text, and bullet points).
+  Please generate a comprehensive report structured with the following sections. Use markdown for formatting (headings, bold text, and bullet points). Aim for brevity and clarity in each section. Focus on the keywords provided in the job description and test results.
 
-    *1. Overall Performance Summary:*
-    Provide a brief, encouraging opening statement summarizing the candidate's overall performance.
+  1. Overall Performance Summary:
+  Provide a brief, encouraging opening statement summarizing the candidate's overall performance. (Limit: 50 words)
 
-    *2. Strengths:*
-    Based on their test scores and the average difficulty of the questions, identify the candidate's strongest skills. Explain why these are considered strengths.
+  2. Strengths:
+  Based on their test scores and the average difficulty of the questions, identify the candidate's strongest skills. Explain why these are considered strengths. (Limit: 100 words)
 
-    *3. Areas for Improvement:*
-    Identify the skills where the candidate struggled the most. Provide constructive, non-judgmental feedback. Suggest specific concepts or topics within these skills that might need more attention.
+  3. Areas for Improvement:
+  Identify the skills where the candidate struggled the most. Provide constructive, non-judgmental feedback. Suggest specific concepts or topics within these skills that might need more attention. (Limit: 100 words)
 
-    *4. Actionable Feedback & Next Steps:*
-    Offer concrete, actionable advice for improvement. Suggest resources, types of projects, or areas of study that would help strengthen their weaker areas.
+  4. Actionable Feedback & Next Steps:
+  Offer concrete, actionable advice for improvement. Suggest resources, types of projects, or areas of study that would help strengthen their weaker areas. (Limit: 100 words)
 
-    *5. Job Fit Analysis:*
-    Conclude with an analysis of how the candidate's demonstrated skills align with the requirements listed in the job description. Highlight the skills that make them a strong potential fit and mention which areas they should focus on to become an even better candidate for this type of role.
-    """
+  5. Job Fit Analysis:
+  Conclude with an analysis of how the candidate's demonstrated skills align with the requirements listed in the job description. Highlight the skills that make them a strong potential fit and mention which areas they should focus on to become an even better candidate for this type of role. (Limit: 100 words)"""
 
     try:
         response = model.generate_content(prompt)
