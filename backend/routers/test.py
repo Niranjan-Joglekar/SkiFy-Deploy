@@ -81,7 +81,7 @@ def submit_answer(answer: AnswerInput):
 
     test_state["question_number"] += 1
 
-    if test_state["question_number"] > test_state["total_questions"]:
+    if test_state["question_number"] >= test_state["total_questions"]:
         final_score = calculate_final_score(test_state["all_questions"])
 
         return {

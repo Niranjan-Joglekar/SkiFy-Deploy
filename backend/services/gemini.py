@@ -7,7 +7,7 @@ load_dotenv()
 
 # Configure Gemini
 genai.configure(api_key=(os.getenv("GEMINI_API_KEY")))
-model = genai.GenerativeModel(model_name="gemini-1.5-flash")
+model = genai.GenerativeModel(model_name="gemini-2.5-flash")
 
 def clamp(time_ratio):
     if time_ratio > 1.1:
