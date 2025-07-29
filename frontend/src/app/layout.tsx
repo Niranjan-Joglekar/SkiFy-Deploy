@@ -2,18 +2,17 @@ import type { Metadata } from "next";
 import { Be_Vietnam_Pro, Cutive_Mono } from "next/font/google";
 import "@/app/globals.css";
 
-const beVietnamProFont = Be_Vietnam_Pro({
+export const beVietnamProFont = Be_Vietnam_Pro({
   weight: "400",
   subsets: ["latin"],
   variable: "--font-be-vietnam-pro"
 })
 
-const codeFont = Cutive_Mono({
+export const codeFont = Cutive_Mono({
   weight: "400",
   subsets: ["latin"],
   variable: "--font-cutive-mono"
 })
-
 
 export const metadata: Metadata = {
   title: "Ski-Fy",

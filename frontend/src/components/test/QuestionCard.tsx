@@ -1,18 +1,5 @@
 import React from 'react';
-import { Code2 } from 'lucide-react';
-
-
-interface Question {
-    question: string,
-    code?: string,
-    option_1: string,
-    option_2: string,
-    option_3: string,
-    option_4: string,
-    question_number: number,
-    correct_option: string,
-    expected_time_sec: number,
-}
+import { Question } from '@/lib/types';
 
 interface QuestionCardProps {
     question: Question | null;
@@ -29,15 +16,13 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     questionNumber,
     totalQuestions
 }) => {
-    const optionLabels = ['A', 'B', 'C', 'D'];
 
     return (
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
             {/* Question Header */}
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
-                    <Code2 className="text-[#2563EB]" size={24} />
-                    <span className="text-[#2563EB]">SQL Question</span>
+                    <span className="text-[#2563EB]">Question</span>
                 </div>
                 <div className="text-gray-500">
                     {questionNumber} / {totalQuestions}
@@ -61,40 +46,37 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
             {/* Answer Options */}
             <div className="space-y-3">
-                {[  question?.option_1,
-                    question?.option_2,
-                    question?.option_3,
-                    question?.option_4]
+                {question?.options
                     .map((option, index) => (
-                    <div
-                        key={index}
-                        className={`border-2 rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${selectedAnswer === index
+                        <div
+                            key={index}
+                            className={`border-2 rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${selectedAnswer === index
                                 ? 'border-[#2563EB] bg-blue-50'
                                 : 'border-gray-200 hover:border-gray-300'
-                            }`}
-                        onClick={() => onAnswerSelect(index)}
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${selectedAnswer === index
+                                }`}
+                            onClick={() => onAnswerSelect(index)}
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${selectedAnswer === index
                                     ? 'border-[#2563EB] bg-[#2563EB] text-white'
                                     : 'border-gray-300 bg-white text-gray-600'
-                                }`}>
-                                {optionLabels[index]}
+                                    }`}>
+                                    {index + 1}
+                                </div>
+                                <span className={`${selectedAnswer === index ? 'text-[#2563EB]' : 'text-gray-700'
+                                    }`}>
+                                    {option}
+                                </span>
                             </div>
-                            <span className={`${selectedAnswer === index ? 'text-[#2563EB]' : 'text-gray-700'
-                                }`}>
-                                {option}
-                            </span>
                         </div>
-                    </div>
-                ))}
+                    ))}
             </div>
 
             {/* Selection Indicator */}
             {selectedAnswer !== null && (
                 <div className="mt-4 text-sm text-[#2563EB] flex items-center gap-2">
                     <div className="w-2 h-2 bg-[#2563EB] rounded-full"></div>
-                    Selected: Option {optionLabels[selectedAnswer]}
+                    Selected: Option {selectedAnswer + 1}
                 </div>
             )}
         </div>

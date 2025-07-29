@@ -1,5 +1,5 @@
-"use client"
-import React, { useState, useEffect } from 'react';
+"use client";
+import React, { useState, useEffect, useRef } from 'react';
 import { Clock } from 'lucide-react';
 
 interface TimerProps {
@@ -9,30 +9,27 @@ interface TimerProps {
   onReset?: () => void;
 }
 
-export const Timer: React.FC<TimerProps> = ({ 
-  onTimeUp, 
-  duration = 60, 
+export const Timer: React.FC<TimerProps> = ({
+  onTimeUp,
+  duration = 60,
   isActive,
-  onReset 
+  onReset
 }) => {
   const [timeLeft, setTimeLeft] = useState(duration);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setTimeLeft(duration);
   }, [duration, onReset]);
 
   useEffect(() => {
-    if (!isActive) return;
+    if (!isActive || timeLeft <= 0) return;
 
-    if (timeLeft <= 0) {
-      onTimeUp?.();
-      return;
-    }
-
-    const timer = setInterval(() => {
+    timerRef.current = setInterval(() => {
       setTimeLeft(prev => {
         const newTime = prev - 1;
         if (newTime <= 0) {
+          clearInterval(timerRef.current!);
           onTimeUp?.();
           return 0;
         }
@@ -40,8 +37,8 @@ export const Timer: React.FC<TimerProps> = ({
       });
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, [timeLeft, isActive, onTimeUp]);
+    return () => clearInterval(timerRef.current!);
+  }, [isActive]);
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;

@@ -25,48 +25,55 @@ const navbarItems: { title: string; href: string; description: string }[] = [
       "",
   },
   {
-    title: "Courses",
-    href: "/courses",
+    title: "Take a Test",
+    href: "/test",
     description:
       "",
   },
+
+  // {
+  //   title: "Courses",
+  //   href: "/courses",
+  //   description:
+  //     "",
+  // },
+  // {
+  //   title: "About Us",
+  //   href: "/about-us",
+  //   description:
+  //     "",
+  // },
   {
-    title: "About Us",
-    href: "/about-us",
+    title: "Resume Analyzer ",
+    href: "/resume",
     description:
       "",
   },
-  {
-    title: "Pricing",
-    href: "/pricing",
-    description:
-      "",
-  },
-  {
-    title: "Contact",
-    href: "/contact",
-    description:
-      "",
-  },
+  // {
+  //   title: "Contact",
+  //   href: "/contact",
+  //   description:
+  //     "",
+  // },
 ]
 
 const authNavbarItems: { title: string; href: string; description: string, className: string, linkClassName: string }[] = [
-  {
-    title: "Sign Up",
-    href: "/sign-up",
-    description:
-      "",
-    className: "",
-    linkClassName: ""
-  },
-  {
-    title: "Login",
-    href: "/login",
-    description:
-      "",
-    className: "bg-blue-500 text-white rounded-md hover:bg-blue-800",
-    linkClassName: "hover:bg-blue-800 hover:text-accent-white px-5",
-  },
+  // {
+  //   title: "Sign Up",
+  //   href: "/sign-up",
+  //   description:
+  //     "",
+  //   className: "",
+  //   linkClassName: ""
+  // },
+  // {
+  //   title: "Login",
+  //   href: "/login",
+  //   description:
+  //     "",
+  //   className: "bg-blue-500 text-white rounded-md hover:bg-blue-800",
+  //   linkClassName: "hover:bg-blue-800 hover:text-accent-white px-5",
+  // },
 ]
 
 export function Navbar() {

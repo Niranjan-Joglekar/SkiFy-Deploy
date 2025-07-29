@@ -1,23 +1,16 @@
 "use client"
 import React, { useState, useCallback, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Flag, RotateCcw } from 'lucide-react';
+import { CircleCheckBig } from 'lucide-react';
 import { Button } from '../ui/button';
 import { QuestionCard } from './QuestionCard';
 import { Timer } from './Timer';
 import { ProgressIndicator } from './ProgressIndicator';
 import { useParams } from 'next/navigation';
 import axios from 'axios';
-
-interface Question {
-    question: string,
-    option_1: string,
-    option_2: string,
-    option_3: string,
-    option_4: string,
-    question_number: number,
-    correct_option: string,
-    expected_time_sec: number,
-}
+import { Question } from '@/lib/types';
+import Link from 'next/link';
+import Image from 'next/image';
+import logo from "../../../public/logo.png"
 
 interface TestState {
     currentQuestion: number;
@@ -26,14 +19,14 @@ interface TestState {
     isCompleted: boolean;
 }
 
-const totalQuestions = 20;
+const totalQuestions = 10;
 
 export const TestInterface: React.FC = () => {
     const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
     const { topic } = useParams();
-    const [selectedAnswer, setSelectedAnswer] = useState<string>("");
+    const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
     const [startTime, setStartTime] = useState<number>(Date.now());
 
     const [testState, setTestState] = useState<TestState>({
@@ -48,14 +41,7 @@ export const TestInterface: React.FC = () => {
     const answeredQuestions = new Set(Object.keys(testState.answers).map(Number));
 
     const handleAnswerSelect = useCallback((answerIndex: number) => {
-        const optionMap: { [key: number]: string } = {
-            1: currentQuestion?.option_1 || "",
-            2: currentQuestion?.option_2 || "",
-            3: currentQuestion?.option_3 || "",
-            4: currentQuestion?.option_4 || ""
-        };
-
-        setSelectedAnswer(optionMap[answerIndex] || "");
+        setSelectedAnswer(answerIndex);
         setTestState(prev => ({
             ...prev,
             answers: {
@@ -80,7 +66,7 @@ export const TestInterface: React.FC = () => {
         fetchData();
     }, [topic]);
 
-    const handleNextQuestion = useCallback(async (chosen_option: string, time_taken: number) => {
+    const handleNextQuestion = useCallback(async (chosen_option: number | null, time_taken: number) => {
         try {
             setLoading(true);
             const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/test/answer`, {
@@ -97,7 +83,7 @@ export const TestInterface: React.FC = () => {
                 currentQuestion: prev.currentQuestion + 1
             }));
             setTimerKey(prev => prev + 1);
-            setSelectedAnswer("");
+            setSelectedAnswer(chosen_option);
             setStartTime(Date.now());
             setLoading(false);
         } catch (error) {
@@ -107,138 +93,151 @@ export const TestInterface: React.FC = () => {
     }, [currentQuestion]);
 
     const handleTimeUp = useCallback(() => {
+        const timeLimit = currentQuestion?.expected_time_sec || 90;
+
         if (testState.currentQuestion < totalQuestions) {
-            handleNextQuestion("", 0);
+            handleNextQuestion(null, timeLimit);
         } else {
             setTestState(prev => ({ ...prev, isCompleted: true }));
         }
-    }, [testState.currentQuestion, handleNextQuestion]);
+    }, [testState.currentQuestion, handleNextQuestion, currentQuestion]);
 
 
     const handleSubmitTest = useCallback(() => {
         setTestState(prev => ({ ...prev, isCompleted: true }));
     }, []);
 
-    const handleRestartTest = useCallback(() => {
-        setTestState({
-            currentQuestion: 1,
-            answers: {},
-            timeSpent: {},
-            isCompleted: false
-        });
-        setTimerKey(prev => prev + 1);
-    }, []);
+    // const handleRestartTest = useCallback(() => {
+    //     setTestState({
+    //         currentQuestion: 1,
+    //         answers: {},
+    //         timeSpent: {},
+    //         isCompleted: false
+    //     });
+    //     setTimerKey(prev => prev + 1);
+    // }, []);
 
-    const calculateScore = () => {
-        return { correct: 0, total: Object.keys(testState.answers).length };
-    };
+    // if (testState.isCompleted) {
+    //     return (
+    //         <div className="max-w-4xl mx-auto p-6">
+    //             <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 text-center">
+    //                 <div className="mb-6">
+    //                     <div className="w-20 h-20 bg-[#2563EB] rounded-full flex items-center justify-center mx-auto mb-4">
+    //                         <Flag className="text-white" size={32} />
+    //                     </div>
+    //                     <h1 className="text-3xl mb-2 text-gray-800">Test Completed!</h1>
+    //                     <p className="text-gray-600">You have successfully completed the assessment.</p>
+    //                 </div>
 
-    if (testState.isCompleted) {
-        const { correct, total } = calculateScore();
-        const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
+    //                 <div className="bg-gray-50 rounded-lg p-6 mb-6">
+    //                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    //                         <div>
+    //                             <div className="text-2xl text-[#2563EB]">{correct}</div>
+    //                             <div className="text-gray-600">Correct Answers</div>
+    //                         </div>
+    //                         <div>
+    //                             <div className="text-2xl text-gray-800">{total}</div>
+    //                             <div className="text-gray-600">Questions Attempted</div>
+    //                         </div>
+    //                         <div>
+    //                             <div className={`text-2xl ${percentage >= 70 ? 'text-green-600' : percentage >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
+    //                                 {percentage}%
+    //                             </div>
+    //                             <div className="text-gray-600">Score</div>
+    //                         </div>
+    //                     </div>
+    //                 </div>
 
-        return (
-            <div className="max-w-4xl mx-auto p-6">
-                <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 text-center">
-                    <div className="mb-6">
-                        <div className="w-20 h-20 bg-[#2563EB] rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Flag className="text-white" size={32} />
-                        </div>
-                        <h1 className="text-3xl mb-2 text-gray-800">Test Completed!</h1>
-                        <p className="text-gray-600">You have successfully completed the SQL assessment.</p>
-                    </div>
-
-                    <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <div className="text-2xl text-[#2563EB]">{correct}</div>
-                                <div className="text-gray-600">Correct Answers</div>
-                            </div>
-                            <div>
-                                <div className="text-2xl text-gray-800">{total}</div>
-                                <div className="text-gray-600">Questions Attempted</div>
-                            </div>
-                            <div>
-                                <div className={`text-2xl ${percentage >= 70 ? 'text-green-600' : percentage >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
-                                    {percentage}%
-                                </div>
-                                <div className="text-gray-600">Score</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <Button
-                        onClick={handleRestartTest}
-                        className="bg-[#2563EB] hover:bg-blue-700"
-                    >
-                        <RotateCcw size={16} className="mr-2" />
-                        Restart Test
-                    </Button>
-                </div>
-            </div>
-        );
-    }
+    //                 <Button
+    //                     onClick={handleRestartTest}
+    //                     className="bg-[#2563EB] hover:bg-blue-700"
+    //                 >
+    //                     <RotateCcw size={16} className="mr-2" />
+    //                     Restart Test
+    //                 </Button>
+    //             </div>
+    //         </div>
+    //     );
+    // }
 
     return (
-        <div className="max-w-7xl mx-auto p-6">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                {/* Sidebar with Progress and Timer */}
-                <div className="lg:col-span-1">
-                    <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 space-y-6 sticky top-6">
-                        <div>
-                            <h3 className="text-lg mb-4 text-gray-800">Test Progress</h3>
-                            <ProgressIndicator
-                                currentQuestion={testState.currentQuestion}
-                                totalQuestions={totalQuestions}
-                                answeredQuestions={answeredQuestions}
-                            />
+        <div className="">
+            {/* Header */}
+            <header className="bg-white shadow-sm border-b border-gray-200">
+                <div className="max-w-7xl mx-auto px-6 py-4 flexjustify-center">
+                    <div className="flex items-center gap-3">
+                        {/* Logo */}
+                        <div className="flex items-center bg-blue-500 rounded-md">
+                            <Link href="/">
+                                <Image src={logo} alt={"Ski-Fy Logo"} width="50" height="50" className="" />
+                            </Link>
                         </div>
+                        <h1 className="text-xl text-gray-900">Ski-Fy</h1>
+                    </div>
+                    <div className="text-xl text-center text-gray-900">Test on {topic}</div>
+                </div>
+            </header>
+            <div className='max-w-7xl mx-auto p-6'>
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    {/* Sidebar with Progress and Timer */}
+                    <div className="lg:col-span-1">
+                        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 space-y-6 sticky top-6">
+                            <div>
+                                <h3 className="text-lg mb-4 text-gray-800">Test Progress</h3>
+                                <ProgressIndicator
+                                    currentQuestion={testState.currentQuestion}
+                                    totalQuestions={totalQuestions}
+                                    answeredQuestions={answeredQuestions}
+                                />
+                            </div>
 
-                        <div>
-                            <h3 className="text-lg mb-4 text-gray-800">Time Remaining</h3>
-                            <Timer
-                                key={timerKey}
-                                duration={currentQuestion?.expected_time_sec || 90}
-                                isActive={true}
-                                onTimeUp={handleTimeUp}
-                            />
+                            <div>
+                                <h3 className="text-lg mb-4 text-gray-800">Time Remaining</h3>
+                                <Timer
+                                    key={timerKey}
+                                    duration={currentQuestion?.expected_time_sec || 90}
+                                    isActive={true}
+                                    onTimeUp={handleTimeUp}
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Main Question Area */}
-                <div className="lg:col-span-3">
-                    <QuestionCard
-                        question={currentQuestion}
-                        selectedAnswer={testState.answers[testState.currentQuestion] ?? null}
-                        onAnswerSelect={handleAnswerSelect}
-                        questionNumber={currentQuestion?.question_number || 1}
-                        totalQuestions={totalQuestions}
-                    />
+                    {/* Main Question Area */}
+                    <div className="lg:col-span-3">
+                        <QuestionCard
+                            question={currentQuestion}
+                            selectedAnswer={testState.answers[testState.currentQuestion] ?? null}
+                            onAnswerSelect={handleAnswerSelect}
+                            questionNumber={currentQuestion?.question_number || 1}
+                            totalQuestions={totalQuestions}
+                        />
 
-                    {/* Navigation Controls */}
-                    <div className="flex justify-between items-center mt-6">
-                        <div className="flex gap-3">
-                            {testState.currentQuestion === totalQuestions ? (
-                                <Button
-                                    onClick={handleSubmitTest}
-                                    className="bg-green-600 hover:bg-green-700"
-                                >
-                                    <Flag size={16} className="mr-2" />
-                                    Submit Test
-                                </Button>
-                            ) : (
-                                <Button
-                                    onClick={() => {
-                                        const timeSpent = Math.floor((Date.now() - startTime) / 1000);
-                                        handleNextQuestion(selectedAnswer, timeSpent);
-                                    }}
-                                    className="bg-[#2563EB] hover:bg-blue-700 cursor-pointer"
-                                    disabled={testState.currentQuestion === totalQuestions || loading}
-                                >
-                                    Next
-                                </Button>
-                            )}
+                        {/* Navigation Controls */}
+                        <div className="flex justify-between items-center mt-6">
+                            <div className="flex gap-3">
+                                {testState.currentQuestion === totalQuestions ? (
+                                    <Button
+                                        onClick={handleSubmitTest}
+                                        className="bg-green-500 hover:bg-green-600"
+                                    >
+                                        <CircleCheckBig size={16} className="mr-2" />
+                                        Submit Test
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        onClick={() => {
+                                            const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+                                            const chosen_option = selectedAnswer;
+                                            handleNextQuestion(chosen_option, timeSpent);
+                                        }}
+                                        className="bg-[#2563EB] hover:bg-blue-700 cursor-pointer"
+                                        disabled={testState.currentQuestion === totalQuestions || loading}
+                                    >
+                                        Next
+                                    </Button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
