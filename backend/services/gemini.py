@@ -100,3 +100,69 @@ def calculate_final_score(all_questions):
 
     performance = (user_score / upper_bound) * 100
     return round(performance)
+
+
+
+def generate_holistic_report(all_test_results, job_description_text):
+    """
+    Analyzes all test results against a job description to generate a holistic report.
+
+    Args:
+        all_test_results (dict): A dictionary where keys are skills and values are 
+                                 the list of question results for that skill.
+        job_description_text (str): The text of the job description.
+
+    Returns:
+        str: A formatted report with insights and feedback.
+    """
+    
+    results_summary = []
+
+    # Flattened list assumption
+    correct_count = sum(1 for q in all_test_results if q["correct"])
+    total_count = len(all_test_results)
+    avg_difficulty = sum(q['difficulty'] for q in all_test_results) / total_count if total_count > 0 else 0
+    results_summary.append(
+        f"- Skill: General, Score: {correct_count}/{total_count}, "
+        f"Average Question Difficulty: {avg_difficulty:.1f}/5.0"
+    )
+
+    results_str = "\n".join(results_summary)
+
+    prompt = f"""
+    As a professional technical recruiter and career coach, your task is to provide a holistic analysis of a candidate's performance in a series of technical skills tests and evaluate their fit for a specific job.
+
+    *Job Description:*
+    ---
+    {job_description_text}
+    ---
+
+    *Candidate's Test Performance Summary:*
+    ---
+    {results_str}
+    ---
+
+    Please generate a comprehensive report structured with the following sections. Use markdown for formatting (headings, bold text, and bullet points).
+
+    *1. Overall Performance Summary:*
+    Provide a brief, encouraging opening statement summarizing the candidate's overall performance.
+
+    *2. Strengths:*
+    Based on their test scores and the average difficulty of the questions, identify the candidate's strongest skills. Explain why these are considered strengths.
+
+    *3. Areas for Improvement:*
+    Identify the skills where the candidate struggled the most. Provide constructive, non-judgmental feedback. Suggest specific concepts or topics within these skills that might need more attention.
+
+    *4. Actionable Feedback & Next Steps:*
+    Offer concrete, actionable advice for improvement. Suggest resources, types of projects, or areas of study that would help strengthen their weaker areas.
+
+    *5. Job Fit Analysis:*
+    Conclude with an analysis of how the candidate's demonstrated skills align with the requirements listed in the job description. Highlight the skills that make them a strong potential fit and mention which areas they should focus on to become an even better candidate for this type of role.
+    """
+
+    try:
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        print(f"Error generating holistic report: {e}")
+        return "There was an error generating the report. Please try again."

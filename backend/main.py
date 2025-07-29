@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import test, resume_analysis
+from routers import test, resume_analysis, report
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -14,5 +14,7 @@ app.add_middleware(
 
 app.include_router(test.router, prefix="/test")
 app.include_router(resume_analysis.router, prefix="/resume")
+app.include_router(report.router, prefix="/report")
+
 
 handler = app

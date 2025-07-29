@@ -4,12 +4,16 @@ from services.resume import get_resume_analysis
 
 router = APIRouter()
 
+job_state = {"job_description": ""}
+
 @router.post("/analyze")
 async def analyze_resume(
     job_description: str = Form(...),
     analysis_type: str = Form(...),
     resume_file: UploadFile = File(...)
 ):
+    job_state["job_description"] = job_description
+    
     if resume_file.content_type != "application/pdf":
         return JSONResponse(status_code=400, content={"error": "Only PDF files are supported"})
 

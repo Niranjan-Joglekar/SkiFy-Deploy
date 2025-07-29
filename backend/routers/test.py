@@ -9,7 +9,7 @@ test_state = {
     "current_level": 3,
     "window": [],
     "question_number": 1,
-    "total_questions": 10,
+    "total_questions": 5,
     "all_questions": [],
     "current_question_data": {}
 }
@@ -104,7 +104,22 @@ def get_score():
         "total_answered": len(test_state["all_questions"]),
         "questions": test_state["all_questions"]
     }
+    
+@router.get("/summary")
+def get_summary():
+    correct = sum(1 for q in test_state["all_questions"] if q["correct"])
+    incorrect = len(test_state["all_questions"]) - correct
+    total = len(test_state["all_questions"])
+    accuracy = (correct / total) * 100 if total > 0 else 0
 
+    return {
+        "correctAnswers": correct,
+        "incorrectAnswers": incorrect,
+        "totalQuestions": total,
+        "accuracy": accuracy,
+        "finalScore": calculate_final_score(test_state["all_questions"]),
+        "questions": test_state["all_questions"]
+    }
 
 
 # from fastapi import APIRouter
