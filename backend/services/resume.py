@@ -23,10 +23,6 @@ def extract_pdf_content(pdf_bytes: bytes):
 
         # Extract text content from all pages with layout information
         for page_num, page in enumerate(doc):
-            # 'text' format provides plain text
-            # 'text' with 'dict' or 'json' provides more structured info (blocks, lines, spans)
-            # For general ATS, plain text is often sufficient, but for detailed layout,
-            # you might process 'textpage.extractDICT()' or 'textpage.extractJSON()'
             all_text_content += page.get_text("text") + "\n\n---PAGE BREAK---\n\n"
 
             # Generate image of the first page only for visual layout analysis
@@ -52,9 +48,10 @@ def extract_pdf_content(pdf_bytes: bytes):
         raise Exception(f"Error processing PDF with PyMuPDF: {e}")
 
 def get_resume_analysis(job_description: str, pdf_bytes: bytes, analysis_type: str):
-    pdf_content_parts = extract_pdf_content(pdf_bytes)
+    pdf_content_parts = []
+    if analysis_type in ["summary", "percentage_match"]:
+        pdf_content_parts = extract_pdf_content(pdf_bytes)
 
-    # Separate text and image parts
     text_content = ""
     image_part = None
     for part in pdf_content_parts:
@@ -122,7 +119,22 @@ Final Thoughts: [Concise professional evaluation of ATS compatibility and layout
         else:
             response = model.generate_content([prompt])
 
+    elif analysis_type == "top_skills":
+        prompt = f"""
+        You are a highly skilled recruitment analyst.
+        Based on the following job description, identify and list the top 3 most important skills required for this role.
+        Present them as bulleted list.
+
+        Job Description:
+        {job_description}
+
+        Top 3 Skills:
+        """
+        model = genai.GenerativeModel('gemini-2.5-flash')
+        # For "top_skills", only the job description is needed, not the resume content.
+        response = model.generate_content([prompt])
+
     else:
-        raise ValueError("Invalid analysis_type. Must be 'summary' or 'percentage_match'.")
+        raise ValueError("Invalid analysis_type. Must be 'summary', 'percentage_match', or 'top_skills'.")
 
     return response.text
