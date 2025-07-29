@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 from services.gemini import generate_question, adjust_difficulty, calculate_final_score
+from typing import Optional
 
 router = APIRouter()
 
@@ -15,7 +16,7 @@ test_state = {
 }
 
 class AnswerInput(BaseModel):
-    user_answer: int
+    user_answer: Optional[int] = None
     time_taken: float
 
 def get_next_question():
@@ -56,7 +57,10 @@ def start_test(topic: str):
 def submit_answer(answer: AnswerInput):
     current_q = test_state["current_question_data"]
 
-    correct = answer.user_answer == current_q["correct_option"]
+    correct = False
+    if answer.user_answer is not None:
+        correct = answer.user_answer == current_q["correct_option"]
+
 
     question_data = {
         "question_number": test_state["question_number"],
