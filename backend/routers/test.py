@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from services.gemini import generate_question, adjust_difficulty
+from services.gemini import generate_question, adjust_difficulty, calculate_final_score
 
 router = APIRouter()
 
@@ -85,8 +85,11 @@ def submit_answer(answer: AnswerInput):
     test_state["question_number"] += 1
 
     if test_state["question_number"] > test_state["total_questions"]:
+        final_score = calculate_final_score(test_state["all_questions"])
+
         return {
             "message": "Test completed",
+            "final_score": final_score, # Add the new score here
             "results": test_state["all_questions"]
         }
         

@@ -52,11 +52,13 @@ def generate_question(topic, difficulty):
     Format strictly as:
     {{
       "question": "Your question here",
-      "option_1": "Option text",
-      "option_2": "Option text",
-      "option_3": "Option text",
-      "option_4": "Option text",
-      "correct_option": "1",
+      "options": [
+        "Option 1 text",
+        "Option 2 text",
+        "Option 3 text",
+        "Option 4 text"
+      ],
+      "correct_option": "0",
       "expected_time_sec": 30
     }}
 
@@ -77,3 +79,23 @@ def generate_question(topic, difficulty):
             "correct_option": "1",
             "expected_time_sec": 30
         }
+
+def calculate_final_score(all_questions):
+    if not all_questions:
+        return 0
+
+    user_score = 0
+    for q in all_questions:
+        if q["correct"]:
+            time_ratio = q["expected_time"] / q["time_taken"]
+            t_bonus = clamp(time_ratio) # clamp is already defined
+            user_score += q["difficulty"] * t_bonus
+
+    # Calculate the maximum possible score
+    upper_bound = sum([q["difficulty"] * 1.2 for q in all_questions])
+
+    if upper_bound == 0:
+        return 0
+
+    performance = (user_score / upper_bound) * 100
+    return round(performance)
