@@ -1,40 +1,15 @@
 {
     "version": 2,
     "builds": [
-      {
-        "src": "main.py",
-        "use": "@vercel/python"
-      }
+        {
+            "src": "main.py",
+            "use": "@vercel/python"
+        }
     ],
     "routes": [
-      {
-        "src": "/test_eg/(.*)",
-        "dest": "/main.py"
-      },
-      {
-        "src": "/resume/(.*)",
-        "dest": "/main.py"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "/main.py"
-      }
+        {
+            "src": "/(.*)",
+            "dest": "/routers"
+        }
     ]
-  }
-  
-
-// {
-//     "version": 2,
-//     "builds": [
-//         {
-//             "src": "main.py",
-//             "use": "@vercel/python"
-//         }
-//     ],
-//     "routes": [
-//         {
-//             "src": "/(.*)",
-//             "dest": "/routers"
-//         }
-//     ]
-// }
+}

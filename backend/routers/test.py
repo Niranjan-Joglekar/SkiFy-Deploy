@@ -35,10 +35,7 @@ def get_next_question():
     return {
         "question_number": test_state["question_number"],
         "question": full_question["question"],
-        "option_1": full_question["option_1"],
-        "option_2": full_question["option_2"],
-        "option_3": full_question["option_3"],
-        "option_4": full_question["option_4"],
+        "options": full_question["options"],
         "expected_time_sec": full_question.get("expected_time_sec", 30),
     }
 
@@ -84,7 +81,7 @@ def submit_answer(answer: AnswerInput):
 
     test_state["question_number"] += 1
 
-    if test_state["question_number"] > test_state["total_questions"]:
+    if test_state["question_number"] >= test_state["total_questions"]:
         final_score = calculate_final_score(test_state["all_questions"])
 
         return {

@@ -122,8 +122,8 @@ Final Thoughts: [Concise professional evaluation of ATS compatibility and layout
     elif analysis_type == "top_skills":
         prompt = f"""
         You are a highly skilled recruitment analyst.
-        Based on the following job description, identify and list the top 3 most important skills required for this role.
-        Present them as bulleted list.
+        Based on the following job description, identify and list only the top 3 most important skill key words required for this role. Example - MySQL, NodeJS, NextJS, etc. Strictly follow this format - {{"skill_1": "", "skill_2": "", "skill_3": ""}}
+        Do not include markdown formatting only return raw json.
 
         Job Description:
         {job_description}
