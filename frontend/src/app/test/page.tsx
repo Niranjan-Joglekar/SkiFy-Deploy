@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link";
-import { Navbar } from "@/components/Navbar";
-import { Button } from "@/components/ui/button";
+import Navbar from "@/components/Navbar";
+import Button from "@/components/ui/button";
 import { useState } from "react";
 import logo from "../../../public/logo.png"
 import Image from "next/image"

@@ -74,7 +74,7 @@ const authNavbarItems: { title: string; href: string; description: string, class
   // },
 ]
 
-export function Navbar() {
+export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
 
@@ -95,7 +95,7 @@ export function Navbar() {
               <NavigationMenuLink asChild>
                 <Link
                   href={listItem.href}
-                  className={pathname.includes(listItem.href) && listItem.href !== "/" ? "text-blue-500 hover:text-blue-600" : ""}
+                  className={`hover:bg-blue-600 hover:text-white transition-colors ${pathname.includes(listItem.href) && listItem.href !== "/" ? "text-blue-500" : ""}`}
                 >
                   {listItem.title}
                 </Link>
@@ -141,7 +141,7 @@ export function Navbar() {
                 <Link
                   key={index}
                   href={listItem.href}
-                  className={`py-2 px-4 hover:bg-gray-100 rounded transform transition-all duration-300 ease-out ${pathname.includes(listItem.href) && listItem.href !== "/" ? "text-blue-500 hover:bg-blue-600" : ""}`}
+                  className={`py-2 px-4 hover:bg-blue-600 hover:text-white rounded transform transition-all duration-300 ease-out ${pathname.includes(listItem.href) && listItem.href !== "/" ? "text-blue-500" : ""}`}
                   style={{
                     animation: `slideInRight 0.3s ease-out ${index * 0.1}s both`
                   }}

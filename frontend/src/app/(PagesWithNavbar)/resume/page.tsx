@@ -1,12 +1,15 @@
 "use client"
 import FileUpload from "@/components/resume/FileUpload";
-import { Button } from "@/components/ui/button";
+import Button from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import { useState } from "react";
 import { FileText, ChartColumn, SearchIcon } from "lucide-react"
 import ReactMarkdown from 'react-markdown';
 import Link from "next/link";
+import JobDescriptionSection from "@/components/resume/JobDescriptionSection";
+import logo from "../../../../public/logo.png"
+import Image from 'next/image';
 
 interface AnalysisResultProps {
     result: string;
@@ -153,35 +156,23 @@ export default function Resume() {
 
     return (
         <div className="">
-            <main className="pt-8">
-                <div className="text-2xl text-center font-[500] pb-2">
-                    Ski-Fy Resume Analysis Platform
-                </div>
-                <div className="text-gray-500 text-center pt-2">
-                    Upload your resume and analyze it against job descriptions to improve your chances.
-                </div>
-                <div className="flex flex-row min-h-[50vh] max-h-[50vh]">
-                    <div className="w-1/2">
-                        <FileUpload onFileUpload={setUploadedFile} />
+            <main className="">
+                <div className="py-8">
+                    <div className="flex items-center justify-center space-x-0 md:space-x-4">
+                        <span>
+                            <Image src={logo} alt="Logo" className="w-12 bg-blue-500 rounded-md hidden md:block" />
+                        </span>
+                        <span className="text-2xl font-semibold">Ski-Fy Resume Analysis Platform</span>
                     </div>
-                    <div className="w-1/2 p-6">
-                        <div className="flex flex-col w-full border border-gray-200 rounded-lg bg-white hover:border-blue-400 p-6 min-h-full">
-                            <div className="text-left font-[500]">
-                                Job Description
-                            </div>
-                            <Textarea
-                                className="mt-4 border-2 rounded-xl w-full h-48 pt-3 px-3 resize-none bg-gray-100"
-                                placeholder="Paste your job description here..."
-                                value={jobDescription}
-                                onChange={(e) => setJobDescription(e.target.value)}
-                            />
-                            <div className="text-gray-500 pt-2 text-sm">
-                                Provide the complete job description for a better analysis.
-                            </div>
-                        </div>
+                    <div className="text-gray-500 text-center pt-2 px-12">
+                        Upload your resume and analyze it against job descriptions to improve your chances.
                     </div>
                 </div>
-                <div className="flex justify-center gap-x-6">
+                <div className="flex flex-col md:flex-row">
+                    <FileUpload onFileUpload={setUploadedFile} />
+                    <JobDescriptionSection onJobDescriptionPaste={setJobDescription} />
+                </div>
+                <div className="flex flex-wrap justify-center gap-x-6">
                     <Button
                         onClick={() => handlePercentageMatchCalculation()}
                         disabled={isAnalyzing || !uploadedFile || !jobDescription.trim() || isFindingTopSkills || isPercentageMatching}
@@ -222,7 +213,7 @@ export default function Resume() {
                     ) : analysisResult ? (
                         <div>
                             <h3 className="text-lg font-semibold mb-2">Analysis Results:</h3>
-                            <div className="prose max-w-none">
+                            <div className="prose max-w-none mx-12">
                                 <ReactMarkdown>{analysisResult.result}</ReactMarkdown>
                             </div>
                         </div>

@@ -1,7 +1,7 @@
 "use client"
 import React, { useState, useCallback, useEffect } from 'react';
 import { CircleCheckBig } from 'lucide-react';
-import { Button } from '../ui/button';
+import Button from '../ui/button';
 import { QuestionCard } from './QuestionCard';
 import { Timer } from './Timer';
 import { ProgressIndicator } from './ProgressIndicator';
@@ -175,7 +175,7 @@ export const TestInterface: React.FC = () => {
                         </div>
                         <h1 className="text-xl text-gray-900">Ski-Fy</h1>
                     </div>
-                    <div className="text-xl text-center text-gray-900">Test on {decodeURIComponent(topic as string)}</div>
+                    <div className="text-xl mt-4 md:mt-0 text-center text-gray-900">Test on {decodeURIComponent(topic as string)}</div>
                 </div>
             </header>
             <div className='max-w-7xl mx-auto p-6'>

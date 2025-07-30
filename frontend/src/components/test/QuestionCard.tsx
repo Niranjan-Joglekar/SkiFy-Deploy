@@ -56,8 +56,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                                 }`}
                             onClick={() => onAnswerSelect(index)}
                         >
-                            <div className="flex items-center gap-3">
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${selectedAnswer === index
+                            <div className="flex items-center gap-2 md:gap-3">
+                                <div className={`min-w-8 min-h-8 rounded-full flex items-center justify-center border-2 transition-all ${selectedAnswer === index
                                     ? 'border-[#2563EB] bg-[#2563EB] text-white'
                                     : 'border-gray-300 bg-white text-gray-600'
                                     }`}>
