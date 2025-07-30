@@ -23,7 +23,7 @@ export default function Test() {
                     <label className="block text-lg font-medium">
                         Enter the skill you'd like to test:
                     </label>
-                    <div className="gap-4 flex flex-col">
+                    <div className="gap-4 flex flex-col px-8">
                         <input
                             type="text"
                             placeholder="What skill would you like to test today?"
