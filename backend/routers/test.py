@@ -29,7 +29,10 @@ def get_next_question():
     # Default to 3 for first 3 questions, then use calculated level
     level = 3 if test_state["question_number"] <= 3 else test_state["current_level"]
     
-    full_question = generate_question(test_state["topic"], level)
+    # PASS THE HISTORY HERE
+    previous_qs = test_state.get("all_questions", [])
+    
+    full_question = generate_question(test_state["topic"], level, previous_questions=previous_qs)
 
     # Store logic internally
     test_state["current_question_data"] = {

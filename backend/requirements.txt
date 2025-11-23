@@ -1,7 +1,9 @@
-fastapi
-google.generativeai
-dotenv
+fastapi[standard]
+uvicorn
+python-dotenv
+google-generativeai
 python-multipart
 pillow
-PyMuPDF
-fastapi[standard]
+pymupdf
+chromadb
+tiktoken
