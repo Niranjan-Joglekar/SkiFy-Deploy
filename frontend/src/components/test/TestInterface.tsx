@@ -5,7 +5,7 @@ import Button from '../ui/button';
 import { QuestionCard } from './QuestionCard';
 import { Timer } from './Timer';
 import { ProgressIndicator } from './ProgressIndicator';
-import { redirect, useParams } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation'; // Changed: Use useRouter
 import axios from 'axios';
 import { Question } from '@/lib/types';
 import Link from 'next/link';
@@ -22,6 +22,7 @@ interface TestState {
 const totalQuestions = 10;
 
 export const TestInterface: React.FC = () => {
+    const router = useRouter(); // Initialize router
     const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
@@ -54,7 +55,9 @@ export const TestInterface: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/test/start/${topic}` || '');
+                // Ensure base URL is clean
+                const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, '') || '';
+                const response = await axios.get(`${baseUrl}/test/start/${topic}`);
                 setCurrentQuestion(response.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -69,97 +72,98 @@ export const TestInterface: React.FC = () => {
     const handleNextQuestion = useCallback(async (chosen_option: number | null, time_taken: number) => {
         try {
             setLoading(true);
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/test/answer`, {
+            const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, '') || '';
+            
+            // Send full context for backend safety
+            const response = await axios.post(`${baseUrl}/test/answer`, {
                 question: currentQuestion?.question,
                 correct_option: currentQuestion?.correct_option,
                 user_answer: chosen_option,
                 time_taken: time_taken,
                 expected_time: currentQuestion?.expected_time_sec,
-                level: 3
+                level: 3 // Default safe level for frontend
             });
+
             setCurrentQuestion(response.data.next_question);
             setTestState(prev => ({
                 ...prev,
                 currentQuestion: prev.currentQuestion + 1
             }));
             setTimerKey(prev => prev + 1);
-            setSelectedAnswer(chosen_option);
+            setSelectedAnswer(null); // Reset selection
             setStartTime(Date.now());
             setLoading(false);
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.error('Error submitting answer:', error);
             setError(error as Error);
+            setLoading(false);
         }
     }, [currentQuestion]);
 
+    // --- FIX 1: UPDATED SUBMIT LOGIC ---
+    const handleSubmitTest = useCallback(async () => {
+        // 1. Capture final question data
+        const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+        const chosen_option = selectedAnswer;
+
+        try {
+            setLoading(true);
+            const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, '') || '';
+
+            // 2. Send the LAST question's answer to the backend
+            await axios.post(`${baseUrl}/test/answer`, {
+                question: currentQuestion?.question,
+                correct_option: currentQuestion?.correct_option,
+                user_answer: chosen_option,
+                time_taken: timeSpent,
+                expected_time: currentQuestion?.expected_time_sec,
+                level: 3
+            });
+
+            // 3. Mark complete and redirect SAFELY
+            setTestState(prev => ({ ...prev, isCompleted: true }));
+            router.push('/test/report'); // Using router.push avoids try/catch redirect errors
+
+        } catch (error) {
+            console.error('Error submitting final answer:', error);
+            setError(error as Error);
+            setLoading(false);
+        }
+    }, [currentQuestion, selectedAnswer, startTime, router]);
+
+
+    // --- FIX 2: UPDATED TIMER LOGIC ---
     const handleTimeUp = useCallback(() => {
         const timeLimit = currentQuestion?.expected_time_sec || 90;
 
         if (testState.currentQuestion < totalQuestions) {
             handleNextQuestion(null, timeLimit);
         } else {
-            setTestState(prev => ({ ...prev, isCompleted: true }));
+            // If time is up on Q10, force submit with null answer
+            const submitTimeout = async () => {
+                try {
+                    setLoading(true);
+                    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, '') || '';
+                    
+                    await axios.post(`${baseUrl}/test/answer`, {
+                        question: currentQuestion?.question,
+                        correct_option: currentQuestion?.correct_option,
+                        user_answer: null, // Timeout = no answer
+                        time_taken: timeLimit,
+                        expected_time: currentQuestion?.expected_time_sec,
+                        level: 3
+                    });
+
+                    setTestState(prev => ({ ...prev, isCompleted: true }));
+                    router.push('/test/report');
+                } catch (error) {
+                    console.error("Error submitting on timeout:", error);
+                    setError(error as Error);
+                }
+            };
+            submitTimeout();
         }
-    }, [testState.currentQuestion, handleNextQuestion, currentQuestion]);
-
-
-    const handleSubmitTest = useCallback(async () => {
-        setTestState(prev => ({ ...prev, isCompleted: true }));
-        redirect('/test/report')
-    }, [topic]);
-
-    // const handleRestartTest = useCallback(() => {
-    //     setTestState({
-    //         currentQuestion: 1,
-    //         answers: {},
-    //         timeSpent: {},
-    //         isCompleted: false
-    //     });
-    //     setTimerKey(prev => prev + 1);
-    // }, []);
-
-    // if (testState.isCompleted) {
-    //     return (
-    //         <div className="max-w-4xl mx-auto p-6">
-    //             <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 text-center">
-    //                 <div className="mb-6">
-    //                     <div className="w-20 h-20 bg-[#2563EB] rounded-full flex items-center justify-center mx-auto mb-4">
-    //                         <Flag className="text-white" size={32} />
-    //                     </div>
-    //                     <h1 className="text-3xl mb-2 text-gray-800">Test Completed!</h1>
-    //                     <p className="text-gray-600">You have successfully completed the assessment.</p>
-    //                 </div>
-
-    //                 <div className="bg-gray-50 rounded-lg p-6 mb-6">
-    //                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-    //                         <div>
-    //                             <div className="text-2xl text-[#2563EB]">{correct}</div>
-    //                             <div className="text-gray-600">Correct Answers</div>
-    //                         </div>
-    //                         <div>
-    //                             <div className="text-2xl text-gray-800">{total}</div>
-    //                             <div className="text-gray-600">Questions Attempted</div>
-    //                         </div>
-    //                         <div>
-    //                             <div className={`text-2xl ${percentage >= 70 ? 'text-green-600' : percentage >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
-    //                                 {percentage}%
-    //                             </div>
-    //                             <div className="text-gray-600">Score</div>
-    //                         </div>
-    //                     </div>
-    //                 </div>
-
-    //                 <Button
-    //                     onClick={handleRestartTest}
-    //                     className="bg-[#2563EB] hover:bg-blue-700"
-    //                 >
-    //                     <RotateCcw size={16} className="mr-2" />
-    //                     Restart Test
-    //                 </Button>
-    //             </div>
-    //         </div>
-    //     );
-    // }
+    }, [testState.currentQuestion, handleNextQuestion, currentQuestion, totalQuestions, router]);
 
     return (
         <div className="">
@@ -216,7 +220,7 @@ export const TestInterface: React.FC = () => {
                         ) : (
                             <QuestionCard
                                 question={currentQuestion}
-                                selectedAnswer={testState.answers[testState.currentQuestion] ?? null}
+                                selectedAnswer={selectedAnswer} 
                                 onAnswerSelect={handleAnswerSelect}
                                 questionNumber={currentQuestion?.question_number || 1}
                                 totalQuestions={totalQuestions}
